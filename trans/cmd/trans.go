@@ -1,18 +1,18 @@
 package cmd
 
 import (
-	"os"
-	"path"
-	"time"
-	"sync"
 	"bufio"
 	"errors"
-	"io/ioutil"
 	"github.com/cheggaaa/pb"
-	"aaronlindsay.com/go/pkg/pso2/ice"
-	"aaronlindsay.com/go/pkg/pso2/text"
-	"aaronlindsay.com/go/pkg/pso2/util"
-	"aaronlindsay.com/go/pkg/pso2/trans"
+	"io/ioutil"
+	"os"
+	"path"
+	"pso2go/ice"
+	"pso2go/text"
+	"pso2go/trans"
+	"pso2go/util"
+	"sync"
+	"time"
 )
 
 func StripDatabase(dbpath, flagStrip string) (err error) {
@@ -76,7 +76,7 @@ func PatchFiles(db *trans.Database, pso2dir, translationName, backupPath, output
 				}
 
 				aname := path.Join(pso2dir, a.Name.String())
-				af, err := os.OpenFile(aname, os.O_RDONLY, 0);
+				af, err := os.OpenFile(aname, os.O_RDONLY, 0)
 				if complain(err) {
 					continue
 				}
@@ -205,12 +205,12 @@ func PatchFiles(db *trans.Database, pso2dir, translationName, backupPath, output
 				pbar.Increment()
 			}
 
-			done <-true
+			done <- true
 		}()
 	}
 
 	for i := range archives {
-		queue <-&archives[i]
+		queue <- &archives[i]
 	}
 	close(queue)
 

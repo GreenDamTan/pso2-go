@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"io"
-	"path"
 	"flag"
-	"aaronlindsay.com/go/pkg/pso2/afp"
+	"fmt"
+	"io"
+	"os"
+	"path"
+	"pso2go/afp"
 )
 
 func usage() {
@@ -20,7 +20,7 @@ func ragequit(apath string, err error) {
 		if apath != "" {
 			fmt.Fprintf(os.Stderr, "error with file `%s`\n", apath)
 		}
-		fmt.Fprintln(os.Stderr, err);
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -44,7 +44,7 @@ func main() {
 
 	apath := flag.Arg(0)
 	fmt.Fprintf(os.Stderr, "Opening archive `%s`...\n", apath)
-	f, err := os.OpenFile(apath, os.O_RDONLY, 0);
+	f, err := os.OpenFile(apath, os.O_RDONLY, 0)
 	ragequit(apath, err)
 
 	a, err := afp.NewArchive(f)
@@ -54,27 +54,27 @@ func main() {
 		for i := 0; i < a.EntryCount(); i++ {
 			file := a.Entry(i)
 
-			fmt.Printf("\t%s (%s):\t0x%08x\n", file.Name, file.Type, file.Size);
+			fmt.Printf("\t%s (%s):\t0x%08x\n", file.Name, file.Type, file.Size)
 
 			if file.Type == "aqo" {
 				m, err := afp.NewModel(file.Data)
 				ragequit(file.Name, err)
 
 				for _, entry := range m.Entries {
-					fmt.Printf("\t\t%s (%s):\t0x%08x\n", entry.Type, entry.SubType, entry.Size);
+					fmt.Printf("\t\t%s (%s):\t0x%08x\n", entry.Type, entry.SubType, entry.Size)
 				}
 			}
 		}
 	}
 
 	if flagExtract != "" {
-		os.MkdirAll(flagExtract, 0777);
+		os.MkdirAll(flagExtract, 0777)
 
 		for i := 0; i < a.EntryCount(); i++ {
 			file := a.Entry(i)
 			fmt.Println("Extracting", file.Name, "...")
 
-			f, err := os.Create(path.Join(flagExtract, file.Name));
+			f, err := os.Create(path.Join(flagExtract, file.Name))
 			ragequit(file.Name, err)
 
 			io.Copy(f, file.Data)

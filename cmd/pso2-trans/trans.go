@@ -1,20 +1,20 @@
 package main
 
 import (
+	"encoding/csv"
+	"errors"
+	"flag"
+	"fmt"
 	"io"
 	"os"
-	"fmt"
-	"flag"
 	"path"
-	"errors"
-	"strings"
+	"pso2go/ice"
+	"pso2go/text"
+	"pso2go/trans"
+	"pso2go/trans/cmd"
+	"pso2go/util"
 	"runtime"
-	"encoding/csv"
-	"aaronlindsay.com/go/pkg/pso2/ice"
-	"aaronlindsay.com/go/pkg/pso2/text"
-	"aaronlindsay.com/go/pkg/pso2/util"
-	"aaronlindsay.com/go/pkg/pso2/trans"
-	"aaronlindsay.com/go/pkg/pso2/trans/cmd"
+	"strings"
 )
 
 func usage() {
@@ -28,7 +28,7 @@ func complain(apath string, err error) bool {
 		if apath != "" {
 			fmt.Fprintf(os.Stderr, "error with file `%s`\n", apath)
 		}
-		fmt.Fprintln(os.Stderr, err);
+		fmt.Fprintln(os.Stderr, err)
 		return true
 	}
 
@@ -48,7 +48,7 @@ func main() {
 
 	flag.Usage = usage
 	flag.IntVar(&flagImport, "i", 0, "import files with the specified version")
-	flag.IntVar(&flagParallel, "p", runtime.NumCPU() + 1, "max parallel tasks")
+	flag.IntVar(&flagParallel, "p", runtime.NumCPU()+1, "max parallel tasks")
 	flag.StringVar(&flagTrans, "t", "", "translation name (eng, story-eng, etc.)")
 	flag.StringVar(&flagBackup, "b", "", "backup files to this path before modifying them")
 	flag.StringVar(&flagStrip, "s", "", "write out a stripped database")
@@ -163,17 +163,17 @@ func main() {
 					continue
 				}
 
-				if f == nil && complain(archive + ": " + fname, errors.New("file not found in database")) {
+				if f == nil && complain(archive+": "+fname, errors.New("file not found in database")) {
 					continue
 				}
 
 				s, err := db.QueryString(f, collision, identifier)
-				if complain(fname + ": " + identifier, err) {
+				if complain(fname+": "+identifier, err) {
 					continue
 				}
 
 				if s == nil {
-					complain(fname + ": " + identifier, errors.New("string not found in database"))
+					complain(fname+": "+identifier, errors.New("string not found in database"))
 					continue
 				}
 
@@ -205,7 +205,7 @@ func main() {
 				}
 
 				fmt.Fprintf(os.Stderr, "Opening archive `%s`...\n", name)
-				af, err := os.OpenFile(name, os.O_RDONLY, 0);
+				af, err := os.OpenFile(name, os.O_RDONLY, 0)
 				if complain(name, err) {
 					continue
 				}
@@ -265,7 +265,7 @@ func main() {
 								collisions[p.Identifier] = collision + 1
 
 								s, err := db.QueryString(f, collision, p.Identifier)
-								if complain(f.Name + ": " + p.Identifier, err) {
+								if complain(f.Name+": "+p.Identifier, err) {
 									break
 								}
 
@@ -292,16 +292,16 @@ func main() {
 											_, err = db.UpdateString(s, flagImport, p.String)
 										}
 
-										if complain(f.Name + ": " + p.Identifier, err) {
+										if complain(f.Name+": "+p.Identifier, err) {
 											break
 										}
 									}
 								} else {
 									if flagTrans != "" {
-										complain(f.Name + ": " + p.Identifier + ": " + p.String, errors.New("translated identifier does not exist"))
+										complain(f.Name+": "+p.Identifier+": "+p.String, errors.New("translated identifier does not exist"))
 									} else {
 										_, err := db.InsertString(f, flagImport, collision, p.Identifier, p.String)
-										if complain(f.Name + ": " + p.Identifier, err) {
+										if complain(f.Name+": "+p.Identifier, err) {
 											break
 										}
 									}

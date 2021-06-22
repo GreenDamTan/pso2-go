@@ -1,11 +1,11 @@
 package afp
 
 import (
-	"io"
-	"fmt"
 	"errors"
-	"aaronlindsay.com/go/pkg/pso2/util"
+	"fmt"
 	"github.com/quarnster/util/encoding/binary"
+	"io"
+	"pso2go/util"
 )
 
 const (
@@ -15,19 +15,19 @@ const (
 type Model struct {
 	reader io.ReadSeeker
 
-	Header ModelHeader
+	Header  ModelHeader
 	Entries []ModelEntry
 }
 
 func NewModel(reader io.ReadSeeker) (*Model, error) {
-	m := &Model{ reader: reader }
+	m := &Model{reader: reader}
 	return m, m.parse()
 }
 
 type ModelHeader struct {
 	Magic, HeaderSize uint32
-	Type string `length:"4"`
-	Unk uint32
+	Type              string `length:"4"`
+	Unk               uint32
 }
 
 type ModelEntry struct {
@@ -58,13 +58,13 @@ func (h *ModelHeader) Validate() error {
 }
 
 func (m *Model) parse() (err error) {
-	reader := binary.BinaryReader{ Reader: m.reader, Endianess: binary.LittleEndian }
+	reader := binary.BinaryReader{Reader: m.reader, Endianess: binary.LittleEndian}
 
 	if err = reader.ReadInterface(&m.Header); err != nil {
 		return
 	}
 
-	reader.Seek(int64(m.Header.HeaderSize) - 0x10, 1)
+	reader.Seek(int64(m.Header.HeaderSize)-0x10, 1)
 
 	offset := int64(m.Header.HeaderSize)
 	for err == nil {
@@ -77,18 +77,18 @@ func (m *Model) parse() (err error) {
 			return
 		}
 
-		entry.Data = io.NewSectionReader(util.ReaderAt(m.reader), offset + 0x0c, int64(entry.Size) - 0x04)
+		entry.Data = io.NewSectionReader(util.ReaderAt(m.reader), offset+0x0c, int64(entry.Size)-0x04)
 		offset += 0x08 + int64(entry.Size)
 
 		m.Entries = append(m.Entries, entry)
 
 		switch entry.SubType {
-			case "NODE": // Bone data
+		case "NODE": // Bone data
 
-			case "NODO": // More bone things
+		case "NODO": // More bone things
 
-			case "VSET": // Vertex data shit
-				err = parseModelEntryVSET(&entry)
+		case "VSET": // Vertex data shit
+			err = parseModelEntryVSET(&entry)
 		}
 	}
 
@@ -100,7 +100,7 @@ func (m *Model) Write(writer io.Writer) error {
 }
 
 func parseModelEntryVSET(entry *ModelEntry) error {
-	reader := binary.BinaryReader{ Reader: entry.Data, Endianess: binary.LittleEndian }
+	reader := binary.BinaryReader{Reader: entry.Data, Endianess: binary.LittleEndian}
 
 	var err error
 
@@ -119,7 +119,7 @@ func parseModelEntryVSET(entry *ModelEntry) error {
 			break
 		}
 
-		if identifier & 0x8000 != 0 { // Size is fucked up
+		if identifier&0x8000 != 0 { // Size is fucked up
 			var sz, unk uint8
 			unk, err = reader.Uint8()
 
@@ -127,7 +127,7 @@ func parseModelEntryVSET(entry *ModelEntry) error {
 			if unk == 0x10 {
 				size, err = reader.Uint16()
 			} else if unk == 0x08 {
-				sz, err = reader.Uint8();
+				sz, err = reader.Uint8()
 				size = uint16(sz)
 			} else {
 				return errors.New("Unknown size flag")
@@ -135,13 +135,13 @@ func parseModelEntryVSET(entry *ModelEntry) error {
 
 			fmt.Printf("Oh %02x, %04x\n", unk, size)
 			x := 2
-			data = make([]uint8, x * int(size + 1))
-		} else if identifier & 0x0900 != 0 { // and 0x0900
+			data = make([]uint8, x*int(size+1))
+		} else if identifier&0x0900 != 0 { // and 0x0900
 			data = make([]uint8, 4)
-		} else if identifier & 0x0600 == 0x0600 { // and 0x0600
+		} else if identifier&0x0600 == 0x0600 { // and 0x0600
 			data = make([]uint8, 2)
-		} else if identifier & 0xff00 != 0 {
-			fmt.Printf("what the fuck is %04x\n", identifier & 0xff00)
+		} else if identifier&0xff00 != 0 {
+			fmt.Printf("what the fuck is %04x\n", identifier&0xff00)
 			//break
 		}
 

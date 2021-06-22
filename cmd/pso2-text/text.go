@@ -1,10 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-	"flag"
-	"aaronlindsay.com/go/pkg/pso2/text"
+	"pso2go/text"
 )
 
 func usage() {
@@ -18,7 +18,7 @@ func ragequit(apath string, err error) {
 		if apath != "" {
 			fmt.Fprintf(os.Stderr, "error with file `%s`\n", apath)
 		}
-		fmt.Fprintln(os.Stderr, err);
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -40,7 +40,7 @@ func main() {
 
 	tpath := flag.Arg(0)
 	fmt.Fprintf(os.Stderr, "Opening file `%s`...\n", tpath)
-	f, err := os.OpenFile(tpath, os.O_RDONLY, 0);
+	f, err := os.OpenFile(tpath, os.O_RDONLY, 0)
 	ragequit(tpath, err)
 
 	t, err := text.NewTextFile(f)

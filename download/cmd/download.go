@@ -1,36 +1,36 @@
 package cmd
 
 import (
-	"io"
-	"os"
-	"path"
-	"time"
-	"sync"
 	"bufio"
 	"bytes"
-	"errors"
-	"runtime"
-	"net/url"
-	"os/exec"
-	"io/ioutil"
 	"crypto/md5"
 	"encoding/json"
+	"errors"
 	"github.com/cheggaaa/pb"
-	"aaronlindsay.com/go/pkg/pso2/download"
-	"aaronlindsay.com/go/pkg/pso2/util"
+	"io"
+	"io/ioutil"
+	"net/url"
+	"os"
+	"os/exec"
+	"path"
+	"pso2go/download"
+	"pso2go/util"
+	"runtime"
+	"sync"
+	"time"
 )
 
 const (
-	PathPatchlist = "patchlist.txt"
-	PathPatchlistOld = "patchlist-old.txt"
+	PathPatchlist          = "patchlist.txt"
+	PathPatchlistOld       = "patchlist-old.txt"
 	PathPatchlistInstalled = "patchlist-installed.txt"
-	PathVersion = "version.ver"
-	PathVersionInstalled = "version-installed.ver"
-	PathTranslateDll = "translate.dll"
-	PathTranslationBin = "translation.bin"
-	PathEnglishDb = "english.db"
-	PathTranslationCfg = "translation.cfg"
-	EnglishUpdateURL = "http://aaronlindsay.com/pso2/download.json"
+	PathVersion            = "version.ver"
+	PathVersionInstalled   = "version-installed.ver"
+	PathTranslateDll       = "translate.dll"
+	PathTranslationBin     = "translation.bin"
+	PathEnglishDb          = "english.db"
+	PathTranslationCfg     = "translation.cfg"
+	EnglishUpdateURL       = "http://aaronlindsay.com/pso2/download.json"
 )
 
 func PathScratch(pso2path string) string {
@@ -175,7 +175,7 @@ func DownloadEnglishFiles(pso2path string) (translationChanged bool, err error) 
 
 	var data struct {
 		ItemTimestamp, EnglishTimestamp, TranslationTimestamp int64
-		ItemURL, EnglishURL, TranslationURL string
+		ItemURL, EnglishURL, TranslationURL                   string
 	}
 
 	d := json.NewDecoder(resp.Body)
@@ -397,12 +397,12 @@ func DownloadChanges(pso2path string, changes []*download.PatchEntry, parallel i
 				}
 			}
 
-			done <-true
+			done <- true
 		}()
 	}
 
 	for _, e := range changes {
-		queue <-e
+		queue <- e
 	}
 	close(queue)
 
@@ -431,7 +431,7 @@ func PruneFiles(pso2path string, patchlist *download.PatchList) (size int64, err
 				continue
 			}
 
-			e := patchlist.EntryMap[f.Name() + ".pat"]
+			e := patchlist.EntryMap[f.Name()+".pat"]
 
 			if e == nil {
 				size += f.Size()

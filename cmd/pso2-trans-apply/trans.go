@@ -1,12 +1,12 @@
 package main
 
 import (
-	"os"
-	"fmt"
 	"flag"
+	"fmt"
+	"os"
+	"pso2go/trans"
+	"pso2go/trans/cmd"
 	"runtime"
-	"aaronlindsay.com/go/pkg/pso2/trans"
-	"aaronlindsay.com/go/pkg/pso2/trans/cmd"
 )
 
 func usage() {
@@ -18,7 +18,7 @@ func complain(apath string, err error) bool {
 		if apath != "" {
 			fmt.Fprintf(os.Stderr, "error with file `%s`\n", apath)
 		}
-		fmt.Fprintln(os.Stderr, err);
+		fmt.Fprintln(os.Stderr, err)
 		return true
 	}
 
@@ -42,7 +42,7 @@ func main() {
 	var flagParallel int
 
 	flag.Usage = usage
-	flag.IntVar(&flagParallel, "p", runtime.NumCPU() + 1, "max parallel tasks")
+	flag.IntVar(&flagParallel, "p", runtime.NumCPU()+1, "max parallel tasks")
 	flag.StringVar(&flagTrans, "t", "", "translation name")
 	flag.StringVar(&flagBackup, "b", "", "backup files to this path before modifying them")
 	flag.StringVar(&flagOutput, "o", "", "alternate output directory")

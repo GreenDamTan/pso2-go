@@ -1,18 +1,18 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"flag"
-	"path"
-	"time"
-	"strings"
-	"runtime"
+	"fmt"
 	"io/ioutil"
-	"aaronlindsay.com/go/pkg/pso2/trans"
-	transcmd "aaronlindsay.com/go/pkg/pso2/trans/cmd"
-	"aaronlindsay.com/go/pkg/pso2/download"
-	"aaronlindsay.com/go/pkg/pso2/download/cmd"
+	"os"
+	"path"
+	"pso2go/download"
+	"pso2go/download/cmd"
+	"pso2go/trans"
+	transcmd "pso2go/trans/cmd"
+	"runtime"
+	"strings"
+	"time"
 )
 
 func wait() {
@@ -167,7 +167,7 @@ func main() {
 		changesSize += e.Size
 	}
 
-	fmt.Fprintf(os.Stderr, "%d file(s) (%0.2f MB) need updating\n", len(changes), float32(changesSize) / 1024 / 1024)
+	fmt.Fprintf(os.Stderr, "%d file(s) (%0.2f MB) need updating\n", len(changes), float32(changesSize)/1024/1024)
 
 	if flagPrint {
 		for _, e := range changes {
@@ -196,7 +196,7 @@ func main() {
 		garbageSize, err := cmd.PruneFiles(pso2path, patchlist)
 		complain("", err)
 
-		fmt.Fprintf(os.Stderr, "Done! Saved %0.2f MB of space.\n", float32(garbageSize) / 1024 / 1024)
+		fmt.Fprintf(os.Stderr, "Done! Saved %0.2f MB of space.\n", float32(garbageSize)/1024/1024)
 	}
 
 	if needsTranslation && len(flagTranslations) > 0 {
@@ -214,7 +214,7 @@ func main() {
 			var errs []error
 			for _, translation := range flagTranslations {
 				win32 := path.Join(pso2path, "data/win32")
-				errs = append(errs, transcmd.PatchFiles(db, win32, translation, backupPath, win32, runtime.NumCPU() + 1)...)
+				errs = append(errs, transcmd.PatchFiles(db, win32, translation, backupPath, win32, runtime.NumCPU()+1)...)
 			}
 
 			for _, err := range errs {

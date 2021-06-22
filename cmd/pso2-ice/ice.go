@@ -1,16 +1,16 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"io"
-	"flag"
 	"bufio"
-	"strings"
 	"errors"
+	"flag"
+	"fmt"
+	"io"
+	"os"
 	"path"
-	"aaronlindsay.com/go/pkg/pso2/ice"
-	"aaronlindsay.com/go/pkg/pso2/util"
+	"pso2go/ice"
+	"pso2go/util"
+	"strings"
 )
 
 func usage() {
@@ -24,7 +24,7 @@ func ragequit(apath string, err error) {
 		if apath != "" {
 			fmt.Fprintf(os.Stderr, "error with file `%s`\n", apath)
 		}
-		fmt.Fprintln(os.Stderr, err);
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -84,7 +84,7 @@ func main() {
 
 	apath := flag.Arg(0)
 	fmt.Fprintf(os.Stderr, "Opening archive `%s`...\n", apath)
-	f, err := os.OpenFile(apath, os.O_RDONLY, 0);
+	f, err := os.OpenFile(apath, os.O_RDONLY, 0)
 	ragequit(apath, err)
 
 	a, err := ice.NewArchive(util.BufReader(f))
@@ -96,7 +96,7 @@ func main() {
 
 			fmt.Printf("Archive Group %d (0x%04x files)\n", i, len(group.Files))
 			for _, file := range group.Files {
-				fmt.Printf("\t%s (%s):\t0x%08x\n", file.Name, file.Type, file.Size);
+				fmt.Printf("\t%s (%s):\t0x%08x\n", file.Name, file.Type, file.Size)
 			}
 		}
 	}
@@ -104,14 +104,14 @@ func main() {
 	if flagExtract != "" {
 		for i := 0; i < a.GroupCount(); i++ {
 			extPath := path.Join(flagExtract, fmt.Sprintf("%d", i))
-			os.MkdirAll(extPath, 0777);
+			os.MkdirAll(extPath, 0777)
 
 			group := a.Group(i)
 
 			for _, file := range group.Files {
 				fmt.Println("Extracting", file.Name, "...")
 
-				f, err := os.Create(path.Join(extPath, file.Name));
+				f, err := os.Create(path.Join(extPath, file.Name))
 				ragequit(file.Name, err)
 
 				io.Copy(f, file.Data)

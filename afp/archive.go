@@ -1,10 +1,10 @@
 package afp
 
 import (
-	"io"
 	"errors"
-	"aaronlindsay.com/go/pkg/pso2/util"
 	"github.com/quarnster/util/encoding/binary"
+	"io"
+	"pso2go/util"
 )
 
 const (
@@ -12,13 +12,13 @@ const (
 )
 
 type Archive struct {
-	reader io.ReadSeeker
-	header archiveHeader
+	reader  io.ReadSeeker
+	header  archiveHeader
 	entries []archiveEntry `if:"0"`
 }
 
 func NewArchive(reader io.ReadSeeker) (*Archive, error) {
-	a := &Archive{ reader: reader }
+	a := &Archive{reader: reader}
 	return a, a.parse()
 }
 
@@ -27,9 +27,9 @@ type archiveHeader struct {
 }
 
 type archiveEntry struct {
-	Name string `length:"0x20"`
+	Name                          string `length:"0x20"`
 	DataSize, DataOffset, DataEnd uint32
-	Type string `length:"4"`
+	Type                          string `length:"4"`
 
 	Alignment []uint8 `skip:"DataEnd-0x30" length:"0"`
 
@@ -53,7 +53,7 @@ func (h *archiveHeader) Validate() error {
 }
 
 func (a *Archive) parse() (err error) {
-	reader := binary.BinaryReader{ Reader: a.reader, Endianess: binary.LittleEndian }
+	reader := binary.BinaryReader{Reader: a.reader, Endianess: binary.LittleEndian}
 
 	if err = reader.ReadInterface(&a.header); err != nil {
 		return
@@ -68,7 +68,7 @@ func (a *Archive) parse() (err error) {
 			return
 		}
 
-		entry.Data = io.NewSectionReader(util.ReaderAt(a.reader), entryOffset + int64(entry.DataOffset), int64(entry.DataSize))
+		entry.Data = io.NewSectionReader(util.ReaderAt(a.reader), entryOffset+int64(entry.DataOffset), int64(entry.DataSize))
 		entryOffset += int64(entry.DataEnd)
 	}
 
@@ -81,8 +81,8 @@ func (a *Archive) Write(writer io.Writer) error {
 
 type Entry struct {
 	Type, Name string
-	Size uint32
-	Data io.ReadSeeker
+	Size       uint32
+	Data       io.ReadSeeker
 
 	file *archiveEntry
 }

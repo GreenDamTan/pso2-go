@@ -1,16 +1,16 @@
 package main
 
 import (
-	"os"
-	"net"
-	"fmt"
-	"flag"
-	"io/ioutil"
 	"crypto/rsa"
-	pso2net "aaronlindsay.com/go/pkg/pso2/net"
-	"aaronlindsay.com/go/pkg/pso2/net/packets"
-	"aaronlindsay.com/go/pkg/pso2/util"
+	"flag"
+	"fmt"
 	"github.com/juju/loggo"
+	"io/ioutil"
+	"net"
+	"os"
+	pso2net "pso2go/net"
+	"pso2go/net/packets"
+	"pso2go/util"
 )
 
 var Logger loggo.Logger = loggo.GetLogger("pso2.cmd.pso2-net")
@@ -52,6 +52,7 @@ func findaddr() (addr string) {
 }
 
 type EndpointMap map[uint16]*pso2net.Proxy
+
 func (e EndpointMap) EndpointAnnouncement(ip net.IP, port uint16) {
 	if m, ok := e[port]; ok {
 		m.ClientEndpoint = fmt.Sprintf("%s:%d", ip, port)

@@ -1,14 +1,14 @@
 package net
 
 import (
-	"io"
-	"net"
-	"fmt"
-	"errors"
 	"crypto/cipher"
 	"crypto/rc4"
 	"encoding/binary"
-	"aaronlindsay.com/go/pkg/pso2/net/packets"
+	"errors"
+	"fmt"
+	"io"
+	"net"
+	"pso2go/net/packets"
 )
 
 const maxPacketSize = 0x04000000
@@ -69,7 +69,7 @@ func (c *Connection) ReadPacket() (*packets.Packet, error) {
 		return nil, errors.New("invalid packet size")
 	}
 
-	data := make([]uint8, size - 8)
+	data := make([]uint8, size-8)
 	p.Data = data
 
 	for len(data) > 0 {
@@ -94,7 +94,7 @@ func (c *Connection) ReadPacket() (*packets.Packet, error) {
 func (c *Connection) WritePacket(p *packets.Packet) error {
 	Logger.Tracef("%s writing %s", c, p)
 
-	data := make([]uint8, 8 + len(p.Data))
+	data := make([]uint8, 8+len(p.Data))
 	binary.LittleEndian.PutUint32(data[:4], uint32(len(data)))
 	binary.LittleEndian.PutUint16(data[4:6], p.Type)
 	binary.LittleEndian.PutUint16(data[6:8], p.Flags)

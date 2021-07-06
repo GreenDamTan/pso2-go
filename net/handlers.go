@@ -1,13 +1,13 @@
 package net
 
 import (
-	"path"
+	"crypto/rsa"
+	"encoding/binary"
 	"fmt"
 	"net"
 	"os"
-	"encoding/binary"
-	"crypto/rsa"
-	"aaronlindsay.com/go/pkg/pso2/net/packets"
+	"path"
+	"pso2go/net/packets"
 )
 
 func HandlerCipher(privateKey *rsa.PrivateKey) PacketHandler {
@@ -62,7 +62,7 @@ func (h handlerDump) HandlePacket(c *Connection, p *packets.Packet) (bool, error
 	_, portLocal, _ := net.SplitHostPort(c.LocalAddr().String())
 	filename := path.Join(h.location, fmt.Sprintf("%s-%s-%s.dump", host, portLocal, portRemote))
 
-	f, err := os.OpenFile(filename, os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666)
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 
 	if err != nil {
 		Logger.Warningf("%s error opening dump file %s. %s", c, filename, err)
@@ -70,7 +70,7 @@ func (h handlerDump) HandlePacket(c *Connection, p *packets.Packet) (bool, error
 	}
 
 	end := binary.LittleEndian
-	binary.Write(f, end, uint32(8 + len(p.Data)))
+	binary.Write(f, end, uint32(8+len(p.Data)))
 	binary.Write(f, end, p.Type)
 	binary.Write(f, end, p.Flags)
 	binary.Write(f, end, p.Data)

@@ -1,17 +1,17 @@
 package net
 
 import (
-	"net"
-	"fmt"
-	"sync"
 	"crypto/rsa"
-	"aaronlindsay.com/go/pkg/pso2/net/packets"
+	"fmt"
+	"net"
+	"pso2go/net/packets"
+	"sync"
 )
 
 type Proxy struct {
 	ServerEndpoint, ClientEndpoint string
 
-	connections map[*Connection]*Connection
+	connections     map[*Connection]*Connection
 	connectionsLock sync.Mutex
 }
 
@@ -117,9 +117,9 @@ func ProxyHandlerShip(p *Proxy, l ProxyEndpointListener, ip net.IP) PacketHandle
 }
 
 type proxyHandlerShip struct {
-	proxy *Proxy
+	proxy    *Proxy
 	listener ProxyEndpointListener
-	addr net.IP
+	addr     net.IP
 }
 
 func (h proxyHandlerShip) HandlePacket(c *Connection, p *packets.Packet) (bool, error) {
@@ -132,7 +132,7 @@ func (h proxyHandlerShip) HandlePacket(c *Connection, p *packets.Packet) (bool, 
 
 	for i := range s.Entries {
 		e := &s.Entries[i]
-		h.listener.EndpointAnnouncement(e.Address(), 12000 + (uint16(e.Number) % 10000))
+		h.listener.EndpointAnnouncement(e.Address(), 12000+(uint16(e.Number)%10000))
 		e.SetAddress(h.addr)
 	}
 
@@ -150,9 +150,9 @@ func ProxyHandlerBlocks(p *Proxy, l ProxyEndpointListener, ip net.IP) PacketHand
 }
 
 type proxyHandlerBlocks struct {
-	proxy *Proxy
+	proxy    *Proxy
 	listener ProxyEndpointListener
-	addr net.IP
+	addr     net.IP
 }
 
 func (h proxyHandlerBlocks) HandlePacket(c *Connection, p *packets.Packet) (bool, error) {
@@ -186,9 +186,9 @@ func ProxyHandlerBlockResponse(p *Proxy, l ProxyEndpointListener, ip net.IP) Pac
 }
 
 type proxyHandlerBlockResponse struct {
-	proxy *Proxy
+	proxy    *Proxy
 	listener ProxyEndpointListener
-	addr net.IP
+	addr     net.IP
 }
 
 func (h proxyHandlerBlockResponse) HandlePacket(c *Connection, p *packets.Packet) (bool, error) {
@@ -216,9 +216,9 @@ func ProxyHandlerBlock(p *Proxy, l ProxyEndpointListener, ip net.IP) PacketHandl
 }
 
 type proxyHandlerBlock struct {
-	proxy *Proxy
+	proxy    *Proxy
 	listener ProxyEndpointListener
-	addr net.IP
+	addr     net.IP
 }
 
 func (h proxyHandlerBlock) HandlePacket(c *Connection, p *packets.Packet) (bool, error) {
@@ -246,9 +246,9 @@ func ProxyHandlerRoom(p *Proxy, l ProxyEndpointListener, ip net.IP) PacketHandle
 }
 
 type proxyHandlerRoom struct {
-	proxy *Proxy
+	proxy    *Proxy
 	listener ProxyEndpointListener
-	addr net.IP
+	addr     net.IP
 }
 
 func (h proxyHandlerRoom) HandlePacket(c *Connection, p *packets.Packet) (bool, error) {
@@ -279,9 +279,9 @@ func ProxyHandlerCipher(p *Proxy, privateKey *rsa.PrivateKey, publicKey *rsa.Pub
 }
 
 type proxyHandlerCipher struct {
-	proxy *Proxy
+	proxy      *Proxy
 	privateKey *rsa.PrivateKey
-	publicKey *rsa.PublicKey
+	publicKey  *rsa.PublicKey
 }
 
 func (h proxyHandlerCipher) HandlePacket(c *Connection, p *packets.Packet) (bool, error) {

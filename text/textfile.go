@@ -1,12 +1,12 @@
 package text
 
 import (
-	"io"
-	"errors"
-	"aaronlindsay.com/go/pkg/pso2/util"
-	"github.com/quarnster/util/encoding/binary"
-	"unicode/utf8"
 	bin "encoding/binary"
+	"errors"
+	"github.com/quarnster/util/encoding/binary"
+	"io"
+	"pso2go/util"
+	"unicode/utf8"
 )
 
 const textBufferThreshold = 0x80000
@@ -25,8 +25,8 @@ type TextFile struct {
 }
 
 type TextEntry struct {
-	Value []uint32
-	Text string
+	Value      []uint32
+	Text       string
 	TextStatus int
 }
 
@@ -52,7 +52,7 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 		return errors.New("NIFL tag expected")
 	}
 
-	reader := binary.BinaryReader{ Reader: nifl.Data, Endianess: binary.LittleEndian }
+	reader := binary.BinaryReader{Reader: nifl.Data, Endianess: binary.LittleEndian}
 
 	type niflHeaderType struct {
 		Unk, OffsetREL0, SizeREL0, OffsetNOF0, SizeNOF0 uint32
@@ -76,10 +76,10 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 
 	var rel0data io.ReadSeeker
 	var rel0strings io.ReadSeeker
-	reader = binary.BinaryReader{ Reader: rel0.Data, Endianess: binary.LittleEndian }
+	reader = binary.BinaryReader{Reader: rel0.Data, Endianess: binary.LittleEndian}
 	rel0size, err := reader.Uint32()
-	rel0data = io.NewSectionReader(util.ReaderAt(rel0.Data), 8, int64(rel0size) - 8)
-	rel0strings = io.NewSectionReader(util.ReaderAt(rel0.Data), int64(rel0size), int64(rel0.Size - rel0size))
+	rel0data = io.NewSectionReader(util.ReaderAt(rel0.Data), 8, int64(rel0size)-8)
+	rel0strings = io.NewSectionReader(util.ReaderAt(rel0.Data), int64(rel0size), int64(rel0.Size-rel0size))
 
 	if rel0size < textBufferDataThreshold {
 		rel0data, err = util.MemReader(rel0data)
@@ -88,7 +88,7 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 		}
 	}
 
-	if rel0.Size - rel0size < textBufferThreshold {
+	if rel0.Size-rel0size < textBufferThreshold {
 		rel0strings, err = util.MemReader(rel0strings)
 		if err != nil {
 			return err
@@ -102,9 +102,9 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 		return errors.New("NOF0 tag expected")
 	}
 
-	nof0reader := binary.BinaryReader{ Reader: nof0.Data, Endianess: binary.LittleEndian }
+	nof0reader := binary.BinaryReader{Reader: nof0.Data, Endianess: binary.LittleEndian}
 	count, err := nof0reader.Uint32()
-	offsets := make([]uint32, int(count) + 1)
+	offsets := make([]uint32, int(count)+1)
 	i := 0
 	for offset, _ := nof0reader.Uint32(); i < int(count); i++ {
 		end, _ := nof0reader.Uint32()
@@ -113,7 +113,7 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 
 		offset = end
 
-		if offsets[i] % 4 != 0 {
+		if offsets[i]%4 != 0 {
 			return errors.New("nof0 entry not a multiple of 32 bits")
 		}
 	}
@@ -121,7 +121,7 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 
 	t.Entries = make([]TextEntry, len(offsets))
 
-	rel0reader := binary.BinaryReader{ Reader: rel0data, Endianess: binary.LittleEndian }
+	rel0reader := binary.BinaryReader{Reader: rel0data, Endianess: binary.LittleEndian}
 
 	pairMode := false
 	var pair *string
@@ -129,8 +129,8 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 	for i, offset := range offsets {
 		entry := &t.Entries[i]
 
-		entry.Value = make([]uint32, offset / 4)
-		for i := 0; i < int(offset / 4); i++ {
+		entry.Value = make([]uint32, offset/4)
+		for i := 0; i < int(offset/4); i++ {
 			entry.Value[i], err = rel0reader.Uint32()
 		}
 
@@ -142,7 +142,7 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 		}
 
 		if len(entry.Value) == 1 && entry.Value[0] != 0xffffffff {
-			rel0strings.Seek(int64(entry.Value[0] - rel0size - 8), 0)
+			rel0strings.Seek(int64(entry.Value[0]-rel0size-8), 0)
 			charSize := 1
 			if pair != nil {
 				charSize = 2
@@ -163,7 +163,7 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 		}
 	}
 
-	_, err = r.Seek(int64((nof0.Size + 8 + 0x0f) / 0x10 * 0x10) - 8, 1)
+	_, err = r.Seek(int64((nof0.Size+8+0x0f)/0x10*0x10)-8, 1)
 
 	nend, err := TagRead(r)
 	if nend.Tag != "NEND" {
@@ -175,7 +175,7 @@ func (t *TextFile) parse(r io.ReadSeeker) (err error) {
 
 func readString(charSize int, reader io.Reader) (string, error) {
 	stringValue := make([]rune, 0)
-	for len(stringValue) == 0 || stringValue[len(stringValue) - 1] != 0 {
+	for len(stringValue) == 0 || stringValue[len(stringValue)-1] != 0 {
 		p := make([]uint8, charSize)
 		_, err := reader.Read(p)
 
@@ -186,11 +186,11 @@ func readString(charSize int, reader io.Reader) (string, error) {
 		if charSize == 1 {
 			stringValue = append(stringValue, rune(p[0]))
 		} else {
-			stringValue = append(stringValue, rune((uint16(p[1]) << 8) | uint16(p[0])))
+			stringValue = append(stringValue, rune((uint16(p[1])<<8)|uint16(p[0])))
 		}
 	}
 
-	return string(stringValue[:len(stringValue) - 1]), nil
+	return string(stringValue[:len(stringValue)-1]), nil
 }
 
 func (t *TextFile) Write(writer io.Writer) error {
@@ -227,7 +227,7 @@ func (t *TextFile) Write(writer io.Writer) error {
 
 	rel0size := entrySize + stringSize + 0x10
 	rel0sizeRounded := (rel0size + 0x0f) / 0x10 * 0x10
-	nof0size := uint32(len(t.Entries) + 1) * 4 + 8
+	nof0size := uint32(len(t.Entries)+1)*4 + 8
 	nof0sizeRounded := (nof0size + 0x0f) / 0x10 * 0x10
 
 	io.WriteString(writer, "NIFL")
@@ -235,13 +235,13 @@ func (t *TextFile) Write(writer io.Writer) error {
 	bin.Write(writer, end, uint32(0x01))
 	bin.Write(writer, end, uint32(0x20))
 	bin.Write(writer, end, rel0sizeRounded)
-	bin.Write(writer, end, rel0sizeRounded + 0x20)
+	bin.Write(writer, end, rel0sizeRounded+0x20)
 	bin.Write(writer, end, nof0sizeRounded)
 	bin.Write(writer, end, uint32(0))
 
 	io.WriteString(writer, "REL0")
-	bin.Write(writer, end, rel0size - 8)
-	bin.Write(writer, end, entrySize + 8)
+	bin.Write(writer, end, rel0size-8)
+	bin.Write(writer, end, entrySize+8)
 	bin.Write(writer, end, uint32(0))
 
 	for _, entry := range t.Entries {
@@ -261,17 +261,17 @@ func (t *TextFile) Write(writer io.Writer) error {
 
 		strlen := len(entry.Text) + 1
 		switch entry.TextStatus {
-			case TextEntryIdentifier:
-				io.WriteString(writer, entry.Text)
-				bin.Write(writer, end, uint8(0))
-			case TextEntryString:
-				for _, r := range entry.Text {
-					bin.Write(writer, end, uint16(r))
-				}
-				bin.Write(writer, end, uint16(0))
-				strlen = (utf8.RuneCountInString(entry.Text) + 1) * 2
-			default:
-				continue
+		case TextEntryIdentifier:
+			io.WriteString(writer, entry.Text)
+			bin.Write(writer, end, uint8(0))
+		case TextEntryString:
+			for _, r := range entry.Text {
+				bin.Write(writer, end, uint16(r))
+			}
+			bin.Write(writer, end, uint16(0))
+			strlen = (utf8.RuneCountInString(entry.Text) + 1) * 2
+		default:
+			continue
 		}
 
 		padding := 4 - (strlen % 4)
@@ -282,11 +282,11 @@ func (t *TextFile) Write(writer io.Writer) error {
 		stringReuse[entry.Text] = entry
 	}
 
-	writer.Write(make([]uint8, rel0sizeRounded - rel0size))
+	writer.Write(make([]uint8, rel0sizeRounded-rel0size))
 
 	io.WriteString(writer, "NOF0")
-	bin.Write(writer, end, nof0size - 8)
-	bin.Write(writer, end, uint32(len(t.Entries) - 1))
+	bin.Write(writer, end, nof0size-8)
+	bin.Write(writer, end, uint32(len(t.Entries)-1))
 
 	offset := uint32(0x10)
 	for _, entry := range t.Entries {
@@ -294,7 +294,7 @@ func (t *TextFile) Write(writer io.Writer) error {
 		offset += uint32(len(entry.Value) * 4)
 	}
 
-	writer.Write(make([]uint8, nof0sizeRounded - nof0size))
+	writer.Write(make([]uint8, nof0sizeRounded-nof0size))
 
 	io.WriteString(writer, "NEND")
 	bin.Write(writer, end, uint32(0x08))

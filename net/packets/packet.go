@@ -1,19 +1,19 @@
 package packets
 
 import (
-	"fmt"
 	"bytes"
-	"github.com/quarnster/util/encoding/binary"
 	bin "encoding/binary"
-	"aaronlindsay.com/go/pkg/pso2/util"
+	"fmt"
+	"github.com/quarnster/util/encoding/binary"
+	"pso2go/util"
 )
 
 const FlagProcessed = 4
 
 type Packet struct {
-	Type uint16
+	Type  uint16
 	Flags uint16
-	Data []uint8
+	Data  []uint8
 }
 
 func (p *Packet) String() string {
@@ -25,7 +25,7 @@ type PacketData interface {
 }
 
 func PacketToBinary(p *Packet, i interface{}) (interface{}, error) {
-	reader := binary.BinaryReader{ Reader: util.Seeker(bytes.NewBuffer(p.Data)), Endianess: binary.LittleEndian }
+	reader := binary.BinaryReader{Reader: util.Seeker(bytes.NewBuffer(p.Data)), Endianess: binary.LittleEndian}
 
 	err := reader.ReadInterface(i)
 

@@ -3,14 +3,14 @@ package text
 // NOTE: This file is all wrong, by the way. Only TagRead() works, the rest can be thrown out
 
 import (
-	"io"
-	"aaronlindsay.com/go/pkg/pso2/util"
-	"github.com/quarnster/util/encoding/binary"
 	bin "encoding/binary"
+	"github.com/quarnster/util/encoding/binary"
+	"io"
+	"pso2go/util"
 )
 
 type TagFileEntry struct {
-	Tag string `length:"4"`
+	Tag  string `length:"4"`
 	Size uint32
 
 	Data io.ReadSeeker `if:"0"`
@@ -23,13 +23,13 @@ type TagFile struct {
 }
 
 func NewTagFile(reader io.ReadSeeker) (*TagFile, error) {
-	f := &TagFile{ nil, reader }
+	f := &TagFile{nil, reader}
 	return f, f.parse()
 }
 
 func (f *TagFile) parse() error {
 	var err error
-	reader := binary.BinaryReader{ Reader: f.reader, Endianess: binary.LittleEndian };
+	reader := binary.BinaryReader{Reader: f.reader, Endianess: binary.LittleEndian}
 
 	offset := int64(0)
 
@@ -52,7 +52,7 @@ func (f *TagFile) parse() error {
 }
 
 func TagRead(r io.ReadSeeker) (TagFileEntry, error) {
-	reader := binary.BinaryReader{ Reader: r, Endianess: binary.LittleEndian };
+	reader := binary.BinaryReader{Reader: r, Endianess: binary.LittleEndian}
 
 	var err error
 	var entry TagFileEntry
@@ -80,7 +80,7 @@ func (f *TagFile) Write(writer io.Writer) (err error) {
 
 		if err == nil || err == io.EOF {
 			if n < int64(size) {
-				err = bin.Write(writer, end, make([]uint8, int64(size) - n))
+				err = bin.Write(writer, end, make([]uint8, int64(size)-n))
 			}
 		}
 

@@ -1,14 +1,14 @@
 package net
 
 import (
+	"pso2go/net/packets"
 	"sort"
-	"aaronlindsay.com/go/pkg/pso2/net/packets"
 )
 
 const (
-	RoutePriorityLow int = -100
-	RoutePriorityNormal = 0
-	RoutePriorityHigh = 100
+	RoutePriorityLow    int = -100
+	RoutePriorityNormal     = 0
+	RoutePriorityHigh       = 100
 )
 
 type PacketHandler interface {
@@ -16,7 +16,7 @@ type PacketHandler interface {
 }
 
 type packetHandlerItem struct {
-	handler PacketHandler
+	handler  PacketHandler
 	priority int
 }
 
@@ -43,6 +43,7 @@ func (r *PacketRoute) RouteMask(t uint16, prio int, h PacketHandler) {
 }
 
 type packetHandlerList []*packetHandlerItem
+
 func (p packetHandlerList) Len() int {
 	return len(p)
 }
@@ -59,7 +60,7 @@ func (r *PacketRoute) RoutePacket(c *Connection, p *packets.Packet) (consumed bo
 	items := make(packetHandlerList, 0, 4)
 
 	for i, h := range r.masks {
-		if h.mask & p.Type != 0 {
+		if h.mask&p.Type != 0 {
 			items = append(items, &r.masks[i].packetHandlerItem)
 		}
 	}

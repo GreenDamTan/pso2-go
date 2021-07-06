@@ -7,3 +7,5 @@
 /pso2-trans
 /pso2-trans-apply
 /pso2-download
+*.exe
+/go.sum

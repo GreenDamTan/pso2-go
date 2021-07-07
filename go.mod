@@ -10,4 +10,5 @@ require (
 	github.com/quarnster/parser v0.0.0-20150905092627-8991807ce6d3 // indirect
 	github.com/quarnster/util v0.0.0-20141123202029-938d948e62f8
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+	github.com/gogf/gf v1.15.7
 )

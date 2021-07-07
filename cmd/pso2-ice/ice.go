@@ -5,11 +5,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/gogf/gf/os/gfile"
 	"io"
 	"os"
 	"path"
 	"pso2go/ice"
-	"pso2go/util"
 	"strings"
 )
 
@@ -84,10 +84,10 @@ func main() {
 
 	apath := flag.Arg(0)
 	fmt.Fprintf(os.Stderr, "Opening archive `%s`...\n", apath)
-	f, err := os.OpenFile(apath, os.O_RDONLY, 0)
-	ragequit(apath, err)
+	//f, err := os.OpenFile(apath, os.O_RDONLY, 0)
+	//ragequit(apath, err)
 
-	a, err := ice.NewArchive(util.BufReader(f))
+	a, err := ice.NewArchive(gfile.GetBytes(apath))
 	ragequit(apath, err)
 
 	if flagPrint {
